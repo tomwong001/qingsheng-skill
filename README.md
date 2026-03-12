@@ -1,4 +1,4 @@
-# 情圣 Qingsheng — Claude Code Skill
+# 情圣 Qingsheng — Skill
 
 中国男性社交表达与恋爱全流程私人教练。
 
@@ -40,4 +40,4 @@
 
 ## 使用方式
 
-本 Skill 为 [Claude Code](https://claude.com/claude-code) 自定义技能，在 Claude Code 中触发即可使用。
+和你的openclaw, claude code, cursor, 等等说，安装这个技能，并且给他链接。
