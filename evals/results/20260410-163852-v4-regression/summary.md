@@ -1,0 +1,33 @@
+# Eval Run Summary
+
+- **Run:** 20260410-163852 (v4-regression)
+- **Skill:** `/tmp/qingsheng-skill/skill/SKILL.md`
+- **Model:** sonnet
+- **Cases:** 18
+- **Pass:** 13
+- **Fail:** 5
+- **Errors:** 0
+- **Avg score:** 7.1 / 10
+
+## Per-case results
+
+| ID | Name | Pass | Score | Notes |
+|----|------|:----:|:-----:|-------|
+| 1 | chat-coldness-scenario | PASS | 9 | The response covers all required criteria: IOD signal analysis (回复变慢+未回复=IOD堆叠), clear situation assessment (局势判断), 2 specific reply suggestions with emoji, avoid-trap warning (不要再催/显得高需求), forward planning (重建聊天框架、约出来见面), and explicitly recommends not sending another message (等她主动). Quality is high throughout with practical, actionable advice. |
+| 2 | date-rejection-analysis | PASS | 9 | The response thoroughly covers all expected criteria: it analyzes each message signal line-by-line (加班/再看吧/哈哈), interprets the contradictory behavior of posting outing photos while claiming to be busy, addresses the investment imbalance by pointing out the user gave away all initiative with '你忙完告诉我', provides concrete next steps (don't mention dinner, wait 2-3 days, send a casual message), and delivers clear leadership planning advising the user to stop being passive and shift out of the 'I'm chasing her' frame with a specific low-pressure invitation strategy. |
+| 3 | comprehensive-coldread | PASS | 8 | 回复覆盖了所有核心标准：冷读分析有性格推断和依据（有边界感、精神世界、回复长=IOI），信号解读明确说明长回复的含金量，提供了2-3个具体约第三次话术（邀约三步法），推荐了匹配她风格的约会地点（展览、咖啡店），并有引领规划（从朋友局到两人单独的锚定策略）。唯一轻微不足是话术中emoji数量偏少，与她文艺风格的匹配度可以更精准。 |
+| 4 | multi-target-switch | PASS | 9 | The response clearly separates both targets and handles them distinctly. For 小美, it loads prior context, correctly identifies the IOI signal with analysis, and provides multiple reply options with a clear directional strategy. For the 探探 match, it acknowledges the platform-to-WeChat transition and explicitly asks for her profile/moments before giving an opener — which is the right approach and implicitly covers asking about user info for a new target. No confusion between the two cases. |
+| 5 | context-continuity | PASS | 9 | The response fully satisfies all five criteria: it explicitly references the previous travel topic suggestion (衔接上次建议), analyzes '好期待下次旅行' as an IOI/window signal (窗口信号解读), provides multiple options to transition from travel talk toward an invitation seed including direct calendar mention and joint travel imagination (嫁接邀约种子), avoids asking about already-known information, and provides a clear 2-3 round conversation roadmap with the '假设场景' escalation strategy. Quality is high with actionable options and strategic reasoning throughout. |
+| 6 | passive-mode-intervention | PASS | 9 | 回复涵盖所有5个评判标准：1) 提供了具体的多个回复方案（方案A/B/C）；2) 明确指出了用户的被动模式（'不要陷在被动里'）并列出了'绝对别说的'内容；3) 教用户在接完这一波后主动带起话题；4) 通过解释哪些回复会'判死刑'或显得'高需求感'，隐含了不能只做应答机器的理念；5) 最后一段明确提出引领规划。内容质量高，分析到位，语气接地气，适合中文约会辅导场景。 |
+| 7 | leading-conversation-coaching | FAIL | 5 | 回复提供了实用的主动权策略和可执行行动方案（符合标准2和3），但未明确从'框架'和'需求感'角度进行诊断（标准1），完全缺失框架对决话术示例（标准5），暧昧期引领心动感的专项方法论也较为薄弱（标准4）。 |
+| 8 | stage5-date-realtime | FAIL | 5 | 回复紧急感到位，给出了3个话题方向（符合3-5个要求），也有引领意识（让她多说话），但完全缺失Kino建议和转场建议这两个约会实战的关键要素，而这两点对于第一次线下约会的推进至关重要；另外对面试式聊天的警示只是暗示而非明确说明。 |
+| 9 | shit-test-response | PASS | 9 | Response covers all 5 criteria well: (1) identifies this as a jealousy/test probe ('废物测试'/吃醋式试探), (2) explicitly warns against serious explanation with clear reasoning, (3) provides 3 humor-tiered responses (调皮/轻松/直接), (4) explains the framework logic for each option (don't defend, redirect, natural denial+compliment), (5) ends with a question to assess relationship stage and guide next steps. Quality is high throughout with practical, directly usable copy-paste responses. |
+| 10 | emotional-leading-scenario | PASS | 7 | 回复肯定了倾听的价值、指出需要情绪领导力（框架失衡/引领对话）、提供了三条具体话术、并明确解释了适时引导不是不关心。唯独'感受先行→情绪转换'这一技巧未被明确命名和教授，虽然话术A和B暗含了这个逻辑结构，但缺乏显式拆解说明。 |
+| 11 | screenshot-auto-analysis | PASS | 8 | The response directly analyzes the situation without asking who the chat is with, clearly identifies the engagement ratio imbalance (her 3 messages vs user's single '嗯'), frames '你怎么不说话了' as a strong IOI/window signal, provides three specific reply options all with emojis, and explicitly calls out the '嗯' reply as passive behavior. However, it completely omits storing the analysis into any material archive (素材存档), which is a required criterion. |
+| 12 | no-reply-scenario | PASS | 9 | The response covers all four criteria: 1) provides specific friend circle comment suggestions with multiple options and rationale; 2) implicitly suggests not simply replying 'goodnight' and notes that not responding is fine ('晚安本来就是日常信号，不回也不是大事'); 3) actively recommends taking initiative to start new topics rather than just reacting; 4) explains the concept of leading the rhythm ('先主动出击反而更有引领感'). All criteria are met with high quality and practical detail. |
+| 13 | regenerate-command | FAIL | 0 | The model failed to handle the /regenerate command entirely, returning only an error message 'Unknown skill: regenerate'. None of the expected criteria were met as no actual content regeneration was attempted. |
+| 14 | ask-quick-question | FAIL | 0 | 模型完全未能处理/ask指令，仅返回了'Unknown skill: ask'错误信息，没有提供任何实质性内容或约会建议。所有评估标准均未满足。 |
+| 15 | platform-specific-bumble | PASS | 9 | The response clearly identifies Bumble and explicitly mentions the female-first messaging mechanic. It builds on the bio content ('会做饭但只会做蛋炒饭') with specific reply options that include emojis, extend the topic naturally, and include follow-up questions (反问). The response also explicitly stages the conversation to avoid rushing for WeChat contact. All five criteria are well satisfied, with high quality and actionable advice. |
+| 16 | user-persona-building | FAIL | 4 | 模型识别了'程序员+篮球+吉他+内向但能聊=反差型人设'这一核心洞察，也未编造信息，但整体响应停留在收集信息阶段，通过追问用户现状来推迟给出实质建议，导致人设标签、探探主页优化、展示面经营等多项关键标准均未完成。 |
+| 17 | no-fabrication-rule | PASS | 9 | The response satisfies all criteria: it doesn't fabricate fake activities, builds the reply around the user's real situation (playing games), packages 'gaming' in an interesting but honest way (especially Method 2's playful framing), implicitly relies on profile-consistent traits without inventing unverified interests, and ends with a forward-leading question to advance the relationship. Both options are practical and the recommendation logic is sound. |
+| 18 | humor-not-aggressive | PASS | 10 | The response fully satisfies all criteria: it explicitly identifies the 'waste test' (废物测试/IOI信号), provides 4 reply options (exceeding the 2-3 minimum), labels each by humor style (调皮/轻松/大胆), maintains a warm and playful tone with no mean-spirited attacks, includes a self-deprecating option (选项三), and uses emojis throughout (😏😄😎🤔😂). |
