@@ -15,5 +15,7 @@ evals/results/20260410-162355-smoke-test/
 # one-off v3→v4 diff analysis, not part of the source
 v4-diff-report.md
 
-# debug UI images uploaded at runtime (keep case JSON, skip bulk image dirs)
+# debug UI cases are user-specific (contain real conversation data, reference
+# local screenshot files). Keep them in the working dir but never commit.
+tools/debug-ui/cases/*.json
 tools/debug-ui/cases/*/
