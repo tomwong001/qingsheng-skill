@@ -1,0 +1,44 @@
+>>> Running 18 eval cases against /tmp/qingsheng-skill/skill/SKILL.md
+>>> Output: /tmp/qingsheng-skill/evals/results/20260410-163852-v4-regression
+
+[1/18] case 1: chat-coldness-scenario
+  PASS  score=9  (sut 39s, judge 17s)
+[2/18] case 2: date-rejection-analysis
+  PASS  score=9  (sut 55s, judge 7s)
+[3/18] case 3: comprehensive-coldread
+  PASS  score=8  (sut 54s, judge 10s)
+[4/18] case 4: multi-target-switch
+  PASS  score=9  (sut 41s, judge 10s)
+[5/18] case 5: context-continuity
+  PASS  score=9  (sut 64s, judge 8s)
+[6/18] case 6: passive-mode-intervention
+  PASS  score=9  (sut 42s, judge 8s)
+[7/18] case 7: leading-conversation-coaching
+  FAIL  score=5  回复提供了实用的主动权策略和可执行行动方案（符合标准2和3），但未明确从'框架'和'需求感'角度进行诊断（标准1），完全缺失框架对决话术示例（标准5），暧昧期引领心动感的专项方法论也较为薄弱（标准4）。
+[8/18] case 8: stage5-date-realtime
+  FAIL  score=5  回复紧急感到位，给出了3个话题方向（符合3-5个要求），也有引领意识（让她多说话），但完全缺失Kino建议和转场建议这两个约会实战的关键要素，而这两点对于第一次线下约会的推进至关重要；另外对面试式聊天的警示只是暗示而非明确说明。
+[9/18] case 9: shit-test-response
+  PASS  score=9  (sut 28s, judge 7s)
+[10/18] case 10: emotional-leading-scenario
+  PASS  score=7  (sut 41s, judge 17s)
+[11/18] case 11: screenshot-auto-analysis
+  PASS  score=8  (sut 41s, judge 15s)
+[12/18] case 12: no-reply-scenario
+  PASS  score=9  (sut 59s, judge 9s)
+[13/18] case 13: regenerate-command
+  FAIL  score=0  The model failed to handle the /regenerate command entirely, returning only an error message 'Unknown skill: regenerate'. None of the expected criteria were met as no actual content regeneration was attempted.
+[14/18] case 14: ask-quick-question
+  FAIL  score=0  模型完全未能处理/ask指令，仅返回了'Unknown skill: ask'错误信息，没有提供任何实质性内容或约会建议。所有评估标准均未满足。
+[15/18] case 15: platform-specific-bumble
+  PASS  score=9  (sut 45s, judge 7s)
+[16/18] case 16: user-persona-building
+  FAIL  score=4  模型识别了'程序员+篮球+吉他+内向但能聊=反差型人设'这一核心洞察，也未编造信息，但整体响应停留在收集信息阶段，通过追问用户现状来推迟给出实质建议，导致人设标签、探探主页优化、展示面经营等多项关键标准均未完成。
+[17/18] case 17: no-fabrication-rule
+  PASS  score=9  (sut 21s, judge 7s)
+[18/18] case 18: humor-not-aggressive
+  PASS  score=10  (sut 20s, judge 12s)
+
+>>> DONE
+>>> Pass: 13 / 18  Fail: 5  Errors: 0  Avg: 7.1
+>>> Summary: /tmp/qingsheng-skill/evals/results/20260410-163852-v4-regression/summary.md
+>>> Raw:     /tmp/qingsheng-skill/evals/results/20260410-163852-v4-regression/results.jsonl

@@ -1,0 +1,44 @@
+>>> Running 18 eval cases against /tmp/qingsheng-skill/skill/SKILL.md
+>>> Output: /tmp/qingsheng-skill/evals/results/20260410-162608-baseline-v3
+
+[1/18] case 1: chat-coldness-scenario
+  PASS  score=8  (sut 29s, judge 8s)
+[2/18] case 2: date-rejection-analysis
+  PASS  score=8  (sut 38s, judge 9s)
+[3/18] case 3: comprehensive-coldread
+  PASS  score=9  (sut 93s, judge 8s)
+[4/18] case 4: multi-target-switch
+  PASS  score=7  (sut 24s, judge 12s)
+[5/18] case 5: context-continuity
+  !! JUDGE returned non-JSON — recording as error
+[6/18] case 6: passive-mode-intervention
+  PASS  score=8  (sut 30s, judge 8s)
+[7/18] case 7: leading-conversation-coaching
+  !! JUDGE returned non-JSON — recording as error
+[8/18] case 8: stage5-date-realtime
+  !! JUDGE returned non-JSON — recording as error
+[9/18] case 9: shit-test-response
+  PASS  score=10  (sut 27s, judge 8s)
+[10/18] case 10: emotional-leading-scenario
+  PASS  score=8  (sut 25s, judge 12s)
+[11/18] case 11: screenshot-auto-analysis
+  PASS  score=8  (sut 36s, judge 10s)
+[12/18] case 12: no-reply-scenario
+  !! JUDGE returned non-JSON — recording as error
+[13/18] case 13: regenerate-command
+  !! JUDGE returned non-JSON — recording as error
+[14/18] case 14: ask-quick-question
+  !! JUDGE returned non-JSON — recording as error
+[15/18] case 15: platform-specific-bumble
+  PASS  score=9  (sut 46s, judge 8s)
+[16/18] case 16: user-persona-building
+  PASS  score=8  (sut 55s, judge 10s)
+[17/18] case 17: no-fabrication-rule
+  PASS  score=9  (sut 21s, judge 8s)
+[18/18] case 18: humor-not-aggressive
+  PASS  score=9  (sut 19s, judge 9s)
+
+>>> DONE
+>>> Pass: 12 / 18  Fail: 0  Errors: 6  Avg: 5.6
+>>> Summary: /tmp/qingsheng-skill/evals/results/20260410-162608-baseline-v3/summary.md
+>>> Raw:     /tmp/qingsheng-skill/evals/results/20260410-162608-baseline-v3/results.jsonl

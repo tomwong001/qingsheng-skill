@@ -1,0 +1,19 @@
+.DS_Store
+__pycache__/
+*.pyc
+
+# eval raw case outputs (noisy). keep summary.md + *.log only.
+evals/results/*/case-*.txt
+evals/results/*/case-*.stderr
+evals/results/*/case-*.json
+evals/results/*/results.jsonl
+
+# empty smoke-test dirs
+evals/results/20260410-162241-smoke-test/
+evals/results/20260410-162355-smoke-test/
+
+# one-off v3→v4 diff analysis, not part of the source
+v4-diff-report.md
+
+# debug UI images uploaded at runtime (keep case JSON, skip bulk image dirs)
+tools/debug-ui/cases/*/
