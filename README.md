@@ -61,7 +61,6 @@
   - `/急` —— 跳过信息门，3-5 句快答
   - `/复盘 <称呼>` —— 读档案串历史（必须跟人名）
 - **AskUserQuestion 驱动的存档位置选择** —— 首次使用时动态探测 agent 原生记忆区 / 项目目录 / 主目录，弹选项让用户点选，agent-agnostic
-- **Debug UI**（`tools/debug-ui/`）—— Python stdlib + 原生 JS 单页应用，支持左右对比两个 skill 版本、存档测试 case、标记"标准答案"做数据集，`claude -p` headless 跑分免 API key
 
 ## v4 保留特性
 
@@ -102,11 +101,6 @@
 │   └── img/
 │       ├── demo1-wechat-coffee.svg     微信被动模式示例
 │       └── demo2-bumble-hiking.svg     Bumble 成功邀约示例
-├── tools/
-│   └── debug-ui/                       左右对比调试 UI（stdlib HTTP + 原生 JS）
-│       ├── server.py
-│       ├── static/index.html
-│       └── cases/                      存档测试场景
 ├── evals/
 │   ├── evals.json                      18 个评估测试用例
 │   ├── run_evals.sh                    自动跑分脚本（claude -p headless，免 API key）
