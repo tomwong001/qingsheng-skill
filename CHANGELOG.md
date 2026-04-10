@@ -36,16 +36,11 @@ v3 had `/regenerate` and `/ask`. v5 has three, all Chinese, no aliases:
 
 First-time storage location is no longer auto-picked. The skill probes for agent-native memory/notes locations (Claude Code / Cursor / Claude Desktop / Codex / git repo root / $HOME), generates 2-4 real-path options, and uses `AskUserQuestion` to let the user click. `storage_root` is persisted in `user-profile.md` frontmatter so subsequent sessions don't re-ask.
 
-### 8. Debug UI for live iteration (tools/debug-ui/)
-
-New Python stdlib HTTP server (no Flask, no pip) at `tools/debug-ui/server.py` + vanilla-JS SPA at `tools/debug-ui/static/index.html`. Lets the user run left/right side-by-side comparisons of two skill versions on archived test cases, upload scenario images, mark a run as "gold answer" for dataset building. Uses `claude -p --append-system-prompt` headless mode — no API key needed.
-
 ### Files touched
 
 ```
 skill/SKILL.md                       rewritten (v4 154 lines → v5 ~170 lines)
 skill/references/user-context.md     persistence section rewritten
-tools/debug-ui/                      new
 .gitignore                           new
 CHANGELOG.md                         this file
 ```
