@@ -1,7 +1,7 @@
 # Eval Run Summary
 
 - **Run:** 20260410-230852 (v5-first-pass)
-- **Skill:** `/Users/tom/Desktop/claudecode/qingsheng-skill/skill/SKILL.md`
+- **Skill:** `skill/SKILL.md`
 - **Model:** sonnet
 - **Cases:** 18
 - **Pass:** 5
