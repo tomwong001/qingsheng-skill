@@ -140,9 +140,10 @@
 ## 怎么做出来的
 
 - **真实用户驱动迭代** —— 每次版本改动都是从实际使用里的痛点反推，不闭门造车
-- **18 条回归测试套件** —— 每个版本发布前跑一遍 eval 拿客观分数，历次基线存在 `evals/results/`，每次迭代的好坏都有账可查
+- **私有语料蒸馏** —— 从大量私有恋爱/社交课程语料中提取了 5000+ 概念和 1400+ 真实对话样本，经过去重、质量筛选后精选融入 skill，不是靠通用模型的"常识"在回答
+- **22 条回归测试套件** —— 每个版本发布前跑一遍 eval 拿客观分数，历次基线存在 `evals/results/`，每次迭代的好坏都有账可查
 - **三道审美关卡** —— 每条建议都要过"**不油腻、不套路、兄弟聊天感**"三个人肉过滤。任何像 PUA 教学腔或 AI 客服话术的输出都会被重写
-- **模块化 Markdown skill** —— ~1000 行结构化设计，区分 7 个关系阶段、7 个主流平台、多目标档案并行、主动引领机制。按需加载参考文件，不是一坨 prompt 塞给模型
+- **模块化 Markdown skill** —— 10 个按需加载的参考文件，区分 7 个关系阶段、7 个主流平台、多目标档案并行、主动引领机制。不是一坨 prompt 塞给模型
 - **全流程透明** —— 所有逻辑都在 `skill/SKILL.md` + `skill/references/*.md` 里，你可以打开看情圣"脑子里在想什么"。没有黑盒，没有隐藏 system prompt
 
 ---
@@ -209,6 +210,10 @@ git clone https://github.com/tomwong001/qingsheng-skill ~/.claude/skills/qingshe
 | `/换一个` | 换角度重新生成（不是换措辞说同样的话） | 对上一条建议不满意 |
 | `/急` | 跳过信息采集，3-5 句直接给答案 | 在外面没时间走全套流程 |
 | `/复盘 <称呼>` | 读档案串历史，复盘你和某个妹子的全部进展 | 想回顾战绩 / 纠结要不要继续 |
+| `/展示面` | 诊断你的社交平台形象——打分 + 问题 + 改法 | 微信头像丑 / 朋友圈不知道发啥 / 探探没人右滑 |
+| `/挽回` | 冷激活（聊天冷了）或关系挽回（分手后），给诊断 + 时间线 + 第一条消息 | 被已读不回 / 突然变冷 / 分手想恢复 |
+| `/自动` | Autopilot 模式——AI 生成 3-5 轮对话树，带分支和节奏控制 | 不知道接下来几天怎么聊 / 想要完整的推进规划 |
+| `/顾问` | 切回默认顾问模式（分析 + 建议，你自己发消息） | 从 Autopilot 退出 |
 
 ### 工作流程
 
@@ -235,6 +240,9 @@ git clone https://github.com/tomwong001/qingsheng-skill ~/.claude/skills/qingshe
 - 🚦 感觉自己总是在"应答机器"模式，想拿回主动权
 - 🌐 不同平台（探探 / Bumble / Soul / 青藤）的差异化策略
 - 🧱 打造真实有吸引力的个人形象（**不是装高价值**）
+- 📸 展示面诊断——头像、朋友圈、签名、Bio 全方位打分 + 改法
+- 🔄 聊天冷了 / 分手了想挽回，有专门的冷激活和关系恢复流程
+- 🤖 不知道接下来几天怎么聊？Autopilot 直接给你对话树，带分支和节奏
 
 ---
 
@@ -249,13 +257,18 @@ qingsheng-skill/
 │       ├── signals-tools.md            #   IOI/IOD · 拉扯 · 引领 · 框架
 │       ├── user-context.md             #   用户档案 · 多目标管理 · 持久化
 │       ├── advanced-techniques.md      #   邀约三步法 · 废测 · Kino · DHV
-│       └── platform-guide.md           #   7 平台差异化 playbook
+│       ├── platform-guide.md           #   7 平台差异化 playbook
+│       ├── examples-library.md         #   40 个真实对话样本（按阶段分类）
+│       ├── mindset-concepts.md         #   15 个心态/元策略概念
+│       ├── profile-audit.md            #   展示面诊断（各平台评分维度）
+│       ├── recovery-playbook.md        #   挽回与冷激活手册
+│       └── autopilot-guide.md          #   Autopilot 对话树模式
 ├── demos/img/
 │   ├── demo1-wechat-coffee.svg         # 微信被动模式示例
 │   ├── demo2-bumble-hiking.svg         # Bumble 成功邀约示例
 │   └── demo3-wechat-moments-cat.svg    # 朋友圈评论示例
 ├── evals/
-│   ├── evals.json                      # 18 条回归测试用例
+│   ├── evals.json                      # 22 条回归测试用例
 │   ├── run_evals.sh                    # 自动跑分脚本（免 API key）
 │   └── results/                        # 历次基线
 ├── CHANGELOG.md
