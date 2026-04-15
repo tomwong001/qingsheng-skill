@@ -163,42 +163,20 @@
 
 ## 安装
 
-> **免依赖**：情圣是纯 Markdown skill。**不需要 Python、不需要 API key、不需要启动服务**，一行命令装好就能用。
+### Claude Code（让 AI 帮你装）
 
-### 一键安装（推荐）
+打开 Claude Code，直接把下面这句话发给它：
 
-```bash
-curl -fsSL https://raw.githubusercontent.com/tomwong001/qingsheng-skill/main/setup | bash
-```
+> 帮我安装情圣 skill：`https://github.com/tomwong001/qingsheng-skill`
 
-自动完成：下载 skill 文件 → 安装到 `~/.claude/skills/qingsheng-skill/` → 注册到 `~/.claude/CLAUDE.md`。
+Claude 会自动完成所有安装步骤。装好之后说 `/qingsheng-upgrade` 可以随时升级。
 
-支持 macOS · Linux · Windows (MINGW/MSYS/WSL)。
+### Claude Cowork（上传 .skill 文件）
 
-### 升级
+1. [下载 qingsheng-skill.skill](https://github.com/tomwong001/qingsheng-skill/releases/latest/download/qingsheng-skill.skill)
+2. 打开 Cowork → Customize tab → 上传刚下载的文件
 
-安装后，在 Claude Code 里直接说：
-
-```
-/qingsheng-upgrade
-```
-
-会自动检查远端版本，有新版本则升级并显示更新内容。
-
-### 手动安装
-
-```bash
-# 装到全局（所有项目都能用）
-git clone https://github.com/tomwong001/qingsheng-skill ~/.claude/skills/qingsheng-skill
-
-# 或装到当前项目
-mkdir -p .claude/skills
-git clone https://github.com/tomwong001/qingsheng-skill .claude/skills/qingsheng-skill
-```
-
-### Cursor / Codex / Claude Desktop
-
-把 skill 目录加到你 agent 的 skills 路径即可。具体路径参考各 agent 官方文档。情圣是 **agent-agnostic** 设计，不假设任何特定 agent 的存储约定。
+搞定，不需要命令行。
 
 ---
 
