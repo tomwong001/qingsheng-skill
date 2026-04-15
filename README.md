@@ -163,17 +163,37 @@
 
 ## 安装
 
-> **免依赖**：情圣是纯 Markdown skill。**不需要 Python、不需要 API key、不需要启动服务**，clone 下来就能用。
+> **免依赖**：情圣是纯 Markdown skill。**不需要 Python、不需要 API key、不需要启动服务**，一行命令装好就能用。
 
-### Claude Code
+### 一键安装（推荐）
 
 ```bash
-# 装到当前项目
-mkdir -p .claude/skills
-git clone https://github.com/tomwong001/qingsheng-skill .claude/skills/qingsheng
+curl -fsSL https://raw.githubusercontent.com/tomwong001/qingsheng-skill/main/setup | bash
+```
 
-# 或装到全局（所有项目都能用）
-git clone https://github.com/tomwong001/qingsheng-skill ~/.claude/skills/qingsheng
+自动完成：下载 skill 文件 → 安装到 `~/.claude/skills/qingsheng-skill/` → 注册到 `~/.claude/CLAUDE.md`。
+
+支持 macOS · Linux · Windows (MINGW/MSYS/WSL)。
+
+### 升级
+
+安装后，在 Claude Code 里直接说：
+
+```
+/qingsheng-upgrade
+```
+
+会自动检查远端版本，有新版本则升级并显示更新内容。
+
+### 手动安装
+
+```bash
+# 装到全局（所有项目都能用）
+git clone https://github.com/tomwong001/qingsheng-skill ~/.claude/skills/qingsheng-skill
+
+# 或装到当前项目
+mkdir -p .claude/skills
+git clone https://github.com/tomwong001/qingsheng-skill .claude/skills/qingsheng-skill
 ```
 
 ### Cursor / Codex / Claude Desktop

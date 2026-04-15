@@ -1,0 +1,124 @@
+#!/usr/bin/env bash
+# setup — install or re-register qingsheng-skill with Claude Code
+# Usage:
+#   curl -fsSL https://raw.githubusercontent.com/tomwong001/qingsheng-skill/main/setup | bash
+#   or: bash setup   (if already cloned)
+#
+# Installs to ~/.claude/skills/qingsheng-skill/ and registers in ~/.claude/CLAUDE.md
+
+set -euo pipefail
+
+REPO_URL="https://github.com/tomwong001/qingsheng-skill.git"
+REPO_RAW="https://raw.githubusercontent.com/tomwong001/qingsheng-skill/main"
+SKILL_NAME="qingsheng-skill"
+GLOBAL_DIR="$HOME/.claude/skills/$SKILL_NAME"
+CLAUDE_MD="$HOME/.claude/CLAUDE.md"
+
+# ── Platform detection ──────────────────────────────────────────────────────
+IS_WINDOWS=0
+case "$(uname -s 2>/dev/null || echo Windows)" in
+  MINGW*|MSYS*|CYGWIN*|Windows_NT) IS_WINDOWS=1 ;;
+esac
+
+# On Windows, adjust paths
+if [[ $IS_WINDOWS -eq 1 ]]; then
+  GLOBAL_DIR="$APPDATA/.claude/skills/$SKILL_NAME"
+  CLAUDE_MD="$APPDATA/.claude/CLAUDE.md"
+fi
+
+# ── Detect install source ────────────────────────────────────────────────────
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" 2>/dev/null && pwd || echo "")"
+IS_CLONED=0
+if [[ -n "$SCRIPT_DIR" && -f "$SCRIPT_DIR/VERSION" && -d "$SCRIPT_DIR/skill" ]]; then
+  IS_CLONED=1
+  SOURCE_DIR="$SCRIPT_DIR"
+fi
+
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  情圣 (qingsheng-skill) installer"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+# ── Install skill files ──────────────────────────────────────────────────────
+mkdir -p "$GLOBAL_DIR"
+
+if [[ $IS_CLONED -eq 1 ]]; then
+  echo "→ Copying from local clone: $SOURCE_DIR"
+  cp -r "$SOURCE_DIR/skill" "$GLOBAL_DIR/"
+  cp "$SOURCE_DIR/VERSION" "$GLOBAL_DIR/"
+  cp "$SOURCE_DIR/CHANGELOG.md" "$GLOBAL_DIR/" 2>/dev/null || true
+  # Preserve .git if it exists (enables git-based upgrades)
+  if [[ -d "$SOURCE_DIR/.git" ]]; then
+    # Symlink or re-clone at global path for git-based upgrades
+    if [[ ! -d "$GLOBAL_DIR/.git" ]]; then
+      echo "→ Cloning repo to global path for git-based upgrades..."
+      git clone "$REPO_URL" "$GLOBAL_DIR" 2>/dev/null || {
+        echo "  (git clone failed — installed as vendored copy)"
+      }
+    else
+      echo "→ Git repo already at $GLOBAL_DIR"
+    fi
+  fi
+else
+  # Piped install: clone directly
+  if command -v git &>/dev/null; then
+    echo "→ Cloning via git..."
+    if [[ -d "$GLOBAL_DIR/.git" ]]; then
+      git -C "$GLOBAL_DIR" pull --ff-only
+    else
+      rm -rf "$GLOBAL_DIR"
+      git clone "$REPO_URL" "$GLOBAL_DIR"
+    fi
+  else
+    echo "→ git not found, downloading via curl..."
+    TMP=$(mktemp -d)
+    curl -fsSL "https://github.com/tomwong001/qingsheng-skill/archive/refs/heads/main.tar.gz" \
+      | tar -xz -C "$TMP" --strip-components=1
+    mkdir -p "$GLOBAL_DIR"
+    cp -r "$TMP/skill" "$GLOBAL_DIR/"
+    cp "$TMP/VERSION" "$GLOBAL_DIR/"
+    cp "$TMP/CHANGELOG.md" "$GLOBAL_DIR/" 2>/dev/null || true
+    rm -rf "$TMP"
+  fi
+fi
+
+VERSION=$(cat "$GLOBAL_DIR/VERSION" 2>/dev/null | tr -d '[:space:]')
+echo "→ Installed version: $VERSION"
+
+# ── Register in ~/.claude/CLAUDE.md ─────────────────────────────────────────
+mkdir -p "$(dirname "$CLAUDE_MD")"
+[[ -f "$CLAUDE_MD" ]] || touch "$CLAUDE_MD"
+
+MARKER="# qingsheng-skill"
+if grep -q "$MARKER" "$CLAUDE_MD" 2>/dev/null; then
+  echo "→ Already registered in $CLAUDE_MD (skipping)"
+else
+  echo "→ Registering skill in $CLAUDE_MD"
+  cat >> "$CLAUDE_MD" << BLOCK
+
+# qingsheng-skill
+# 情圣恋爱教练 — 加载方式: 在对话中让 Claude 读取下面的 SKILL.md
+# Skill file: $GLOBAL_DIR/skill/SKILL.md
+# To use: tell Claude "load qingsheng skill from $GLOBAL_DIR/skill/SKILL.md"
+# To upgrade: /qingsheng-upgrade
+
+## 情圣技能说明
+本地 skill 文件在: \`$GLOBAL_DIR/skill/SKILL.md\`
+直接让 Claude 读取该文件即可激活情圣模式。
+升级命令: \`/qingsheng-upgrade\`
+BLOCK
+fi
+
+# ── Write install metadata ───────────────────────────────────────────────────
+META_DIR="$HOME/.qingsheng"
+mkdir -p "$META_DIR"
+echo "$VERSION" > "$META_DIR/installed-version"
+echo "$(date -u +%s)" > "$META_DIR/last-update-check"
+
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  ✅ 安装完成！版本 $VERSION"
+echo ""
+echo "  使用方式："
+echo "    Claude 对话中说: 读取 $GLOBAL_DIR/skill/SKILL.md"
+echo "    或者直接 /qingsheng-upgrade 升级"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
