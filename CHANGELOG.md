@@ -1,5 +1,38 @@
 # Changelog
 
+## v0.9.0 — 2026-04-15 (stage judgment fix + autopilot + self-update)
+
+### 1. Stage judgment accuracy (advisory mode)
+
+Added a "强信号强制升级规则" table in SKILL.md mapping specific observable signals to minimum stage numbers. Fixes systematic under-staging where the model defaulted to 阶段3 on any ambiguous signal:
+
+- 女方用亲昵称呼 → 最低阶段4
+- 深夜主动联系 / 持续高频回复 → 最低阶段5
+- 对话出现性话题且女方参与配合 → 最低阶段6
+- etc.
+
+### 2. Autopilot format hardening
+
+Strengthened `[发送]` output rules in both SKILL.md and `references/autopilot-guide.md`:
+- First line MUST be unconditional `[发送]` — not inside an if/else branch
+- Banned Markdown formatting (`**`, `—`, `·`) inside `[发送]` messages
+- Fixed safety boundary: refusing autopilot for normal escalate-stage intimate conversation is now an error; only pause for explicit media/violence or explicit rejection
+
+### 3. Eval improvements (v2 chatlog suite)
+
+Built 30-case advisory + 30-case autopilot eval suite from real transcribed chatlog corpus. Final results: advisory 97% (29/30), autopilot 83% (25/30) — both above 80% target.
+
+### 4. Self-update mechanism (`/qingsheng-upgrade`)
+
+New `setup` script + `skill/qingsheng-upgrade.md` upgrade skill. Features:
+- One-liner install: `curl -fsSL https://raw.githubusercontent.com/tomwong001/qingsheng-skill/main/setup | bash`
+- Detects install type: git-managed (uses `git pull`) or vendored (re-downloads tarball)
+- Platform support: macOS/Linux (`~/.claude/skills/`) + Windows MINGW/MSYS/WSL (`$APPDATA/.claude/skills/`)
+- Auto-registers in `~/.claude/CLAUDE.md`
+- Shows CHANGELOG summary after upgrade
+
+---
+
 ## v5 — 2026-04-10 (behavior rewrite on top of v4 refactor)
 
 v4 was a maintainability refactor that held behavior constant. v5 is an **opinionated rewrite** of the behavior itself, driven by live user testing. Five changes:
