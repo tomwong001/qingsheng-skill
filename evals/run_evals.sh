@@ -30,6 +30,8 @@ OUT_ROOT="$SCRIPT_DIR/results"
 ONLY=""
 LABEL=""
 MODEL="sonnet"
+SUT_MODEL=""
+JUDGE_MODEL=""
 MAX_TURNS=8
 
 # ---- arg parsing ----
@@ -40,11 +42,17 @@ while [[ $# -gt 0 ]]; do
     --only) ONLY="$2"; shift 2 ;;
     --label) LABEL="$2"; shift 2 ;;
     --model) MODEL="$2"; shift 2 ;;
+    --sut-model) SUT_MODEL="$2"; shift 2 ;;
+    --judge-model) JUDGE_MODEL="$2"; shift 2 ;;
     -h|--help)
       sed -n '2,25p' "$0"; exit 0 ;;
     *) echo "unknown arg: $1" >&2; exit 1 ;;
   esac
 done
+
+# --sut-model / --judge-model override --model individually; otherwise fall back to --model.
+SUT_MODEL="${SUT_MODEL:-$MODEL}"
+JUDGE_MODEL="${JUDGE_MODEL:-$MODEL}"
 
 # ---- preflight ----
 [[ -f "$SKILL_DIR/SKILL.md" ]] || { echo "SKILL.md not found at $SKILL_DIR" >&2; exit 1; }
@@ -88,6 +96,8 @@ fi
 
 TOTAL=$(echo "$CASE_IDS" | wc -w | tr -d ' ')
 echo ">>> Running $TOTAL eval cases against $SKILL_DIR/SKILL.md"
+echo ">>> SUT model:   $SUT_MODEL"
+echo ">>> Judge model: $JUDGE_MODEL"
 echo ">>> Output: $RUN_DIR"
 echo ""
 
@@ -110,7 +120,7 @@ for CID in $CASE_IDS; do
   SUT_START=$(date +%s)
   SUT_JSON=$(cd "$WORK_DIR" && claude -p \
     --no-session-persistence \
-    --model "$MODEL" \
+    --model "$SUT_MODEL" \
     --append-system-prompt "$SKILL_CONTENT" \
     --add-dir "$SKILL_DIR" \
     --output-format json \
@@ -157,7 +167,7 @@ Score the actual response against the expected criteria. Return ONLY the JSON ob
   JUDGE_START=$(date +%s)
   JUDGE_JSON=$(cd "$WORK_DIR" && claude -p \
     --no-session-persistence \
-    --model "$MODEL" \
+    --model "$JUDGE_MODEL" \
     --system-prompt "$JUDGE_SYSTEM" \
     --output-format json \
     --max-turns 2 \
@@ -228,7 +238,8 @@ AVG=$(awk "BEGIN {if ($TOTAL > 0) printf \"%.1f\", $SCORE_SUM/$TOTAL; else print
   echo ""
   echo "- **Run:** $TS${LABEL:+ ($LABEL)}"
   echo "- **Skill:** \`$SKILL_DIR/SKILL.md\`"
-  echo "- **Model:** $MODEL"
+  echo "- **SUT model:** $SUT_MODEL"
+  echo "- **Judge model:** $JUDGE_MODEL"
   echo "- **Cases:** $TOTAL"
   echo "- **Pass:** $PASS_COUNT"
   echo "- **Fail:** $FAIL_COUNT"
