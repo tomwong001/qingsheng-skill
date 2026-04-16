@@ -108,6 +108,22 @@ else
 BLOCK
 fi
 
+# ── Install subcommand skills as separate directories ───────────────────────
+# Claude Code discovers skills by scanning ~/.claude/skills/*/SKILL.md
+# Each subcommand needs its own directory to appear as a slash command
+SKILLS_ROOT="$(dirname "$GLOBAL_DIR")"
+for subcmd_file in "$GLOBAL_DIR/skill/"*.md; do
+  fname=$(basename "$subcmd_file")
+  # Skip the main SKILL.md and references
+  [[ "$fname" == "SKILL.md" ]] && continue
+  # Extract skill name from filename (remove .md extension)
+  subcmd_name="${fname%.md}"
+  subcmd_dir="$SKILLS_ROOT/$subcmd_name"
+  mkdir -p "$subcmd_dir"
+  cp "$subcmd_file" "$subcmd_dir/SKILL.md"
+  echo "→ Installed subcommand: /$subcmd_name"
+done
+
 # ── Write install metadata ───────────────────────────────────────────────────
 META_DIR="$HOME/.qingsheng"
 mkdir -p "$META_DIR"
