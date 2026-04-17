@@ -108,15 +108,22 @@ else
 BLOCK
 fi
 
-# ── Install subcommand skills as separate directories ───────────────────────
+# ── Deploy skill files to Claude Code discovery path ────────────────────────
 # Claude Code discovers skills by scanning ~/.claude/skills/*/SKILL.md
-# Each subcommand needs its own directory to appear as a slash command
+# The git repo lives at qingsheng-skill/ but skills must be at top level
 SKILLS_ROOT="$(dirname "$GLOBAL_DIR")"
+MAIN_SKILL_DIR="$SKILLS_ROOT/qingsheng"
+
+# Main skill: ~/.claude/skills/qingsheng/SKILL.md + references/
+mkdir -p "$MAIN_SKILL_DIR"
+cp "$GLOBAL_DIR/skill/SKILL.md" "$MAIN_SKILL_DIR/SKILL.md"
+cp -r "$GLOBAL_DIR/skill/references" "$MAIN_SKILL_DIR/references"
+echo "→ Deployed main skill to $MAIN_SKILL_DIR/"
+
+# Subcommands: each gets its own directory
 for subcmd_file in "$GLOBAL_DIR/skill/"*.md; do
   fname=$(basename "$subcmd_file")
-  # Skip the main SKILL.md and references
   [[ "$fname" == "SKILL.md" ]] && continue
-  # Extract skill name from filename (remove .md extension)
   subcmd_name="${fname%.md}"
   subcmd_dir="$SKILLS_ROOT/$subcmd_name"
   mkdir -p "$subcmd_dir"
