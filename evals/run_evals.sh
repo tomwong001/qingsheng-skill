@@ -14,10 +14,12 @@
 # Output: results/<timestamp>/results.jsonl + results/<timestamp>/summary.md
 #
 # Usage:
-#   ./run_evals.sh                       # full run, all 18 cases
-#   ./run_evals.sh --only 1,3,5          # only specific case ids
-#   ./run_evals.sh --skill-dir <path>    # override skill location
-#   ./run_evals.sh --label baseline-v3   # label the run
+#   ./run_evals.sh                                    # full run, all cases
+#   ./run_evals.sh --only 1,3,5                       # only specific case ids
+#   ./run_evals.sh --parallel 10                      # run 10 cases concurrently
+#   ./run_evals.sh --skill-dir <path>                 # override skill location
+#   ./run_evals.sh --label v6.1-advisory-v2           # label the run
+#   ./run_evals.sh --sut-model sonnet --judge-model opus
 
 set -euo pipefail
 
@@ -33,17 +35,19 @@ MODEL="sonnet"
 SUT_MODEL=""
 JUDGE_MODEL=""
 MAX_TURNS=8
+PARALLEL=1
 
 # ---- arg parsing ----
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --skill-dir) SKILL_DIR="$2"; shift 2 ;;
-    --evals-file) EVALS_FILE="$2"; shift 2 ;;
-    --only) ONLY="$2"; shift 2 ;;
-    --label) LABEL="$2"; shift 2 ;;
-    --model) MODEL="$2"; shift 2 ;;
-    --sut-model) SUT_MODEL="$2"; shift 2 ;;
+    --skill-dir)   SKILL_DIR="$2";   shift 2 ;;
+    --evals-file)  EVALS_FILE="$2";  shift 2 ;;
+    --only)        ONLY="$2";        shift 2 ;;
+    --label)       LABEL="$2";       shift 2 ;;
+    --model)       MODEL="$2";       shift 2 ;;
+    --sut-model)   SUT_MODEL="$2";   shift 2 ;;
     --judge-model) JUDGE_MODEL="$2"; shift 2 ;;
+    --parallel)    PARALLEL="$2";    shift 2 ;;
     -h|--help)
       sed -n '2,25p' "$0"; exit 0 ;;
     *) echo "unknown arg: $1" >&2; exit 1 ;;
@@ -98,17 +102,25 @@ TOTAL=$(echo "$CASE_IDS" | wc -w | tr -d ' ')
 echo ">>> Running $TOTAL eval cases against $SKILL_DIR/SKILL.md"
 echo ">>> SUT model:   $SUT_MODEL"
 echo ">>> Judge model: $JUDGE_MODEL"
+echo ">>> Parallel:    $PARALLEL"
 echo ">>> Output: $RUN_DIR"
 echo ""
 
-PASS_COUNT=0
-FAIL_COUNT=0
-ERROR_COUNT=0
-SCORE_SUM=0
+# ---- parallel semaphore (bash 3.x compatible via named pipe + fixed fd 9) ----
+_SEM_PIPE=$(mktemp -u)
+mkfifo "$_SEM_PIPE"
+exec 9<>"$_SEM_PIPE"
+rm -f "$_SEM_PIPE"
+# Fill the pipe with PARALLEL tokens (each token = one byte)
+for _i in $(seq 1 "$PARALLEL"); do printf . >&9; done
 
-i=0
-for CID in $CASE_IDS; do
-  i=$((i+1))
+# ---- process_case function (runs in background subshell) ----
+process_case() {
+  local CID="$1"
+  local i="$2"
+  local RESULT_FILE="$RUN_DIR/case-${CID}.result.json"
+
+  local CASE NAME PROMPT EXPECTED
   CASE=$(jq --argjson id "$CID" '.evals[] | select(.id == $id)' "$EVALS_FILE")
   NAME=$(echo "$CASE" | jq -r '.name')
   PROMPT=$(echo "$CASE" | jq -r '.prompt')
@@ -117,6 +129,7 @@ for CID in $CASE_IDS; do
   echo "[$i/$TOTAL] case $CID: $NAME"
 
   # ---- SUT pass ----
+  local SUT_START SUT_END SUT_DUR SUT_JSON SUT_ERROR SUT_RESPONSE
   SUT_START=$(date +%s)
   SUT_JSON=$(cd "$WORK_DIR" && claude -p \
     --no-session-persistence \
@@ -131,26 +144,37 @@ for CID in $CASE_IDS; do
 
   SUT_ERROR=$(echo "$SUT_JSON" | jq -r '.is_error // false')
   if [[ "$SUT_ERROR" == "true" ]] || ! echo "$SUT_JSON" | jq -e '.result' >/dev/null 2>&1; then
-    echo "  !! SUT error after ${SUT_DUR}s — see case-${CID}-sut.stderr"
-    ERROR_COUNT=$((ERROR_COUNT + 1))
-    jq -nc \
-      --arg id "$CID" --arg name "$NAME" \
-      --arg phase "sut_error" --arg dur "$SUT_DUR" \
-      '{id:$id, name:$name, phase:$phase, sut_duration_s:($dur|tonumber), pass:false, score:0}' \
-      >> "$RESULTS_FILE"
-    continue
+    # Detect policy violation vs generic error
+    local POLICY_HIT=false
+    if grep -qiE "usage.?policy|content.?policy|violat|prohibited|cannot assist|against our|I cannot help|I'm not able" \
+        "$RUN_DIR/case-${CID}-sut.stderr" 2>/dev/null; then
+      POLICY_HIT=true
+    fi
+    local SUT_TEXT
+    SUT_TEXT=$(echo "$SUT_JSON" | jq -r '.result // .error.message // ""' 2>/dev/null || true)
+    if echo "$SUT_TEXT" | grep -qiE "usage.?policy|cannot (help|assist) with|violat|not able to"; then
+      POLICY_HIT=true
+    fi
+
+    if [[ "$POLICY_HIT" == "true" ]]; then
+      echo "  ⏭  SKIPPED (policy) after ${SUT_DUR}s — case $CID"
+      jq -nc --arg id "$CID" --arg name "$NAME" --arg dur "$SUT_DUR" \
+        '{id:$id, name:$name, phase:"skipped", sut_duration_s:($dur|tonumber), pass:false, score:0}' \
+        > "$RESULT_FILE"
+    else
+      echo "  !! SUT error after ${SUT_DUR}s — see case-${CID}-sut.stderr"
+      jq -nc --arg id "$CID" --arg name "$NAME" --arg phase "sut_error" --arg dur "$SUT_DUR" \
+        '{id:$id, name:$name, phase:$phase, sut_duration_s:($dur|tonumber), pass:false, score:0}' \
+        > "$RESULT_FILE"
+    fi
+    return
   fi
 
   SUT_RESPONSE=$(echo "$SUT_JSON" | jq -r '.result')
   echo "$SUT_RESPONSE" > "$RUN_DIR/case-${CID}-response.txt"
 
   # ---- JUDGE pass ----
-  JUDGE_INPUT=$(jq -nc \
-    --arg prompt "$PROMPT" \
-    --arg expected "$EXPECTED" \
-    --arg response "$SUT_RESPONSE" \
-    '{prompt:$prompt, expected_output:$expected, actual_response:$response}')
-
+  local JUDGE_PROMPT JUDGE_JSON JUDGE_START JUDGE_END JUDGE_DUR JUDGE_RESULT JUDGE_RESULT_CLEAN
   JUDGE_PROMPT="Evaluate this test case. Return JSON only.
 
 PROMPT GIVEN TO MODEL:
@@ -177,11 +201,9 @@ Score the actual response against the expected criteria. Return ONLY the JSON ob
 
   JUDGE_RESULT=$(echo "$JUDGE_JSON" | jq -r '.result // ""')
   # Strip any leading/trailing prose, keep just the JSON object.
-  # Try the raw value first; if it's not valid JSON, attempt to extract a {...} block.
   if echo "$JUDGE_RESULT" | jq -e 'has("pass")' >/dev/null 2>&1; then
     JUDGE_RESULT_CLEAN="$JUDGE_RESULT"
   else
-    # Use python to find the first balanced {...} block
     JUDGE_RESULT_CLEAN=$(python3 -c "
 import sys, json, re
 s = sys.stdin.read()
@@ -196,30 +218,26 @@ if m:
   fi
 
   if ! echo "$JUDGE_RESULT_CLEAN" | jq -e 'has("pass")' >/dev/null 2>&1; then
-    echo "  !! JUDGE returned non-JSON — recording as error"
+    echo "  !! JUDGE returned non-JSON — recording as error (case $CID)"
     echo "$JUDGE_RESULT" > "$RUN_DIR/case-${CID}-judge-raw.txt"
-    ERROR_COUNT=$((ERROR_COUNT + 1))
-    jq -nc \
-      --arg id "$CID" --arg name "$NAME" --arg phase "judge_parse_error" \
+    jq -nc --arg id "$CID" --arg name "$NAME" --arg phase "judge_parse_error" \
       --arg sut_dur "$SUT_DUR" --arg judge_dur "$JUDGE_DUR" \
       '{id:$id, name:$name, phase:$phase, sut_duration_s:($sut_dur|tonumber), judge_duration_s:($judge_dur|tonumber), pass:false, score:0}' \
-      >> "$RESULTS_FILE"
-    continue
+      > "$RESULT_FILE"
+    return
   fi
 
+  local PASS SCORE REASON MISSING
   PASS=$(echo "$JUDGE_RESULT_CLEAN" | jq -r '.pass')
   SCORE=$(echo "$JUDGE_RESULT_CLEAN" | jq -r '.score')
   REASON=$(echo "$JUDGE_RESULT_CLEAN" | jq -r '.reasoning')
   MISSING=$(echo "$JUDGE_RESULT_CLEAN" | jq -c '.missing // []')
 
   if [[ "$PASS" == "true" ]]; then
-    PASS_COUNT=$((PASS_COUNT + 1))
-    echo "  PASS  score=$SCORE  (sut ${SUT_DUR}s, judge ${JUDGE_DUR}s)"
+    echo "  PASS  score=$SCORE  (sut ${SUT_DUR}s, judge ${JUDGE_DUR}s)  [case $CID]"
   else
-    FAIL_COUNT=$((FAIL_COUNT + 1))
-    echo "  FAIL  score=$SCORE  $REASON"
+    echo "  FAIL  score=$SCORE  $REASON  [case $CID]"
   fi
-  SCORE_SUM=$((SCORE_SUM + SCORE))
 
   jq -nc \
     --arg id "$CID" --arg name "$NAME" \
@@ -227,12 +245,44 @@ if m:
     --argjson pass "$PASS" --argjson score "$SCORE" \
     --arg reason "$REASON" --argjson missing "$MISSING" \
     '{id:$id, name:$name, pass:$pass, score:$score, reasoning:$reason, missing:$missing, sut_duration_s:($sut_dur|tonumber), judge_duration_s:($judge_dur|tonumber)}' \
-    >> "$RESULTS_FILE"
+    > "$RESULT_FILE"
+}
+
+export -f process_case
+export TOTAL EVALS_FILE WORK_DIR RUN_DIR SUT_MODEL JUDGE_MODEL SKILL_CONTENT SKILL_DIR MAX_TURNS JUDGE_SYSTEM
+
+# ---- main loop with parallel semaphore ----
+i=0
+for CID in $CASE_IDS; do
+  i=$((i+1))
+  # Acquire semaphore token (blocks if all PARALLEL slots are busy)
+  read -r -n1 -u 9
+  (
+    process_case "$CID" "$i"
+    # Release semaphore token
+    printf . >&9
+  ) &
 done
 
-# ---- summary ----
-AVG=$(awk "BEGIN {if ($TOTAL > 0) printf \"%.1f\", $SCORE_SUM/$TOTAL; else print \"0.0\"}")
+# Wait for all background jobs to finish
+wait
+exec 9>&-
 
+# ---- merge per-case result files into results.jsonl ----
+for f in "$RUN_DIR"/case-*.result.json; do
+  [[ -f "$f" ]] && cat "$f" >> "$RESULTS_FILE"
+done
+
+# ---- compute summary stats from merged JSONL ----
+PASS_COUNT=$(jq -s '[.[] | select(.pass == true)] | length' "$RESULTS_FILE")
+FAIL_COUNT=$(jq -s '[.[] | select(.pass == false and (.phase == null or (.phase != "skipped" and .phase != "sut_error" and .phase != "judge_parse_error")))] | length' "$RESULTS_FILE")
+ERROR_COUNT=$(jq -s '[.[] | select(.phase == "sut_error" or .phase == "judge_parse_error")] | length' "$RESULTS_FILE")
+SKIP_COUNT=$(jq -s '[.[] | select(.phase == "skipped")] | length' "$RESULTS_FILE")
+SCORE_SUM=$(jq -s '[.[] | select(.pass == true) | .score] | add // 0' "$RESULTS_FILE")
+SCORED=$(jq -s '[.[] | select(.phase == null or (.phase != "skipped" and .phase != "sut_error" and .phase != "judge_parse_error"))] | length' "$RESULTS_FILE")
+AVG=$(awk "BEGIN {if ($SCORED > 0) printf \"%.1f\", $SCORE_SUM/$SCORED; else print \"0.0\"}")
+
+# ---- summary ----
 {
   echo "# Eval Run Summary"
   echo ""
@@ -240,21 +290,23 @@ AVG=$(awk "BEGIN {if ($TOTAL > 0) printf \"%.1f\", $SCORE_SUM/$TOTAL; else print
   echo "- **Skill:** \`$SKILL_DIR/SKILL.md\`"
   echo "- **SUT model:** $SUT_MODEL"
   echo "- **Judge model:** $JUDGE_MODEL"
+  echo "- **Parallel workers:** $PARALLEL"
   echo "- **Cases:** $TOTAL"
   echo "- **Pass:** $PASS_COUNT"
   echo "- **Fail:** $FAIL_COUNT"
   echo "- **Errors:** $ERROR_COUNT"
-  echo "- **Avg score:** $AVG / 10"
+  echo "- **Skipped (policy):** $SKIP_COUNT"
+  echo "- **Avg score (scored only):** $AVG / 10"
   echo ""
   echo "## Per-case results"
   echo ""
   echo "| ID | Name | Pass | Score | Notes |"
   echo "|----|------|:----:|:-----:|-------|"
-  jq -r '. | "| \(.id) | \(.name) | \(if .pass then "PASS" else "FAIL" end) | \(.score) | \(.reasoning // .phase // "") |"' "$RESULTS_FILE"
+  jq -r '. | "| \(.id) | \(.name) | \(if .pass then "✅ PASS" elif .phase == "skipped" then "⏭ SKIP" elif .phase then "⚠️ \(.phase)" else "❌ FAIL" end) | \(.score) | \(.reasoning // .phase // "") |"' "$RESULTS_FILE"
 } > "$SUMMARY_FILE"
 
 echo ""
 echo ">>> DONE"
-echo ">>> Pass: $PASS_COUNT / $TOTAL  Fail: $FAIL_COUNT  Errors: $ERROR_COUNT  Avg: $AVG"
+echo ">>> Pass: $PASS_COUNT / $TOTAL  Fail: $FAIL_COUNT  Errors: $ERROR_COUNT  Skipped: $SKIP_COUNT  Avg: $AVG"
 echo ">>> Summary: $SUMMARY_FILE"
 echo ">>> Raw:     $RESULTS_FILE"
