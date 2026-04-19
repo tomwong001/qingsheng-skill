@@ -133,84 +133,65 @@ updated: {最后更新日期}
 
 ---
 
-## 持久化
+## 持久化 — 全局统一路径
 
-这个 skill 不假定具体的存储路径——它在 Claude Code、Cursor、Codex、Claude Desktop 等不同 agent 里跑，每个 agent 有自己的「记笔记」机制。
+**存储根路径**：
+- macOS / Linux：`~/.qingsheng/`
+- Windows：`$APPDATA/.qingsheng/`
 
-**强一致命名约定**（不管落在哪里）：
+这是**跨 agent、跨项目、跨会话**都能找到的统一位置。不再让用户选路径，原因在下面。
 
-- 用户档案文件名：`user-profile.md`
-- 目标对象目录：`targets/`
-- 每个目标一个文件：`targets/{称呼}.md`
-
-### 首次使用：用 AskUserQuestion 让用户**点选**存储位置
-
-**这是硬性要求。** 第一次需要落盘时（创建 `user-profile.md` 或第一个 `targets/xxx.md`），**不要自己挑路径**，必须用 `AskUserQuestion` 工具弹出一个选项列表让用户亲手点。这样用户知道笔记存哪、之后能自己去看。
-
-**这个 skill 在不同 agent 里跑（Claude Code、Cursor、Codex、Claude Desktop、其它），所以选项不能写死。** 步骤如下：
-
-#### 步骤 1：探测当前 agent 有没有"原生记忆区"
-
-按这个顺序检测，**第一个命中的就用它，不要继续往下找**：
-
-1. **当前进程是不是有 memory / scratch / notes 目录约定**？
-   - Claude Code：检查 `~/.claude/projects/<sanitized-cwd>/memory/` 是否存在或可创建
-   - Cursor：检查 `~/.cursor/` 下是否有用户数据目录
-   - Claude Desktop：检查它的 application support 目录
-   - Codex / 其它 CLI：检查它们各自的配置/笔记目录约定
-2. **当前目录是不是 git 仓库**？运行 `git rev-parse --show-toplevel`，拿到仓库根。
-3. **永远可用的兜底**：用户主目录 `$HOME`。
-
-不要假设哪个 agent 一定存在——**实际去探测**（用 Bash 工具 `ls`、`test -d`、检查环境变量 `$CLAUDE_PROJECT_DIR` 等）。探测不到的就不要把它列成选项。
-
-#### 步骤 2：动态生成 2-4 个选项
-
-每个选项都要带**真实的、刚探测出来的绝对路径预览**，不要写"（推荐）""（最稳）"这种模糊字眼，让用户自己判断：
-
-- **选项 1（如果原生记忆区可用）** — `<探测到的原生记忆区路径>/qingsheng/`
-  描述：跟着当前 agent 的笔记系统走，agent 自己会管它
-- **选项 2（如果在 git 仓库里）** — `<repo_root>/.qingsheng/`
-  描述：跟着当前项目走，换项目就换一份档案
-- **选项 3（永远显示）** — `$HOME/.qingsheng/`
-  描述：放在主目录，跨 agent、跨项目都能找到
-- **选项 4（永远显示）** — 自己输入一个路径
-
-#### 步骤 3：用 AskUserQuestion 弹问题
-
-问句模板：
-
-> 兄弟，第一次见你，先把档案安顿好——我要把你和妹子们的笔记存起来，下次回来咱不用从头说一遍。你想存哪儿？（哪个都行，存好了你随时能打开看）
-
-把上面探测出来的选项作为可点击的选项传给 `AskUserQuestion`。
-
-#### 步骤 4：确认后创建目录结构
+### 目录结构
 
 ```
-<chosen_path>/
-├── user-profile.md
-└── targets/
+~/.qingsheng/
+├── user-profile.md         # 用户档案（自己的情况）
+├── targets/                # 每个目标一个文件
+│   ├── Judy.md
+│   ├── 咖啡店女生.md
+│   └── ...
+├── installed-version       # setup 脚本写的，别动
+└── last-update-check       # preamble 写的，别动
 ```
 
-`user-profile.md` 的 frontmatter 里写上 `storage_root: <chosen_path>`，方便下次直接读。
+### 为什么不再 AskUserQuestion 问路径
 
-#### 步骤 5：告诉用户存在哪了
+实测发现用户**根本不在意存哪**，只在意"我能不能看到"。之前让用户点选路径反而：
+- 在第一轮对话前打断节奏
+- 用户选完一头雾水，不知道刚选了什么
+- Cursor/Codex 的原生记忆区路径用户根本不熟，选了也找不到
 
-"好嘞，咱的档案就放在 `<chosen_path>` 了，你随时可以打开看。" 然后进入正常的信息采集流程。
+改成默认 `~/.qingsheng/` + **明确告知路径** 后：
+- 无需用户操作，Skill 直接建档
+- 路径固定，跨 agent 一致（Claude Code / Cursor / Codex 都能找到同一个目录）
+- 用户想看随时 `open ~/.qingsheng/` 或 `cat ~/.qingsheng/targets/Judy.md`
 
-#### 步骤 6：下次回来不要重复问
+### 建档流程
 
-加载档案时第一时间从 `user-profile.md` frontmatter 读 `storage_root`，直接用。**只有在 `user-profile.md` 还不存在时才走步骤 1-3**。
+**首次建档**（`~/.qingsheng/user-profile.md` 不存在）：
 
-### 创建新目标档案时
+1. Bash 创建目录：`mkdir -p ~/.qingsheng/targets`
+2. 创建 `~/.qingsheng/user-profile.md`（用档案模板，能采集到的信息都填上）
+3. 创建 `~/.qingsheng/targets/{称呼}.md`（当前目标）
+4. 告诉用户："建好了，你的档案在 `~/.qingsheng/`，想看随时打开。"
 
-第一次为某个新妹子建 `targets/{称呼}.md` 时，**不需要再弹存储位置选项**（已经在首次使用时定好了），但要：
+**新目标建档**（user-profile.md 已存在，但这个女生是第一次聊）：
 
-1. 确认称呼用什么（用户怎么叫她）—— 用 AskUserQuestion 给 2-3 个候选，例如真名、昵称、特征代号（"咖啡店女生"）
-2. 确认后创建 `targets/{称呼}.md`，告诉用户："建好了，存在 `<storage_root>/targets/{称呼}.md`，下次直接说 `/复盘 {称呼}` 就能调出来。"
+1. 确认称呼（用 `AskUserQuestion` 给 2-3 个候选：真名、昵称、特征代号如"咖啡店女生"）
+2. 创建 `~/.qingsheng/targets/{称呼}.md`
+3. 告诉用户："建好了，存在 `~/.qingsheng/targets/{称呼}.md`，以后说 `/复盘 {称呼}` 就能调出来。"
+
+**老目标回来**（`~/.qingsheng/targets/{称呼}.md` 已存在）：
+- 直接读取档案，输出上次进度摘要，继续。不重复建档。
+
+### 称呼确定策略
+
+- 用户自己明确说了名字/昵称 → 直接用
+- 只有代号（"那个女生"）→ 问 AskUserQuestion 给 2-3 个候选
+- 用户发了截图里有名字 → 用截图里的名字作为默认选项
 
 ### 兜底规则
 
-- **不要**自己 hardcode 路径
-- **不要**在用户没确认前就写入文件
-- **不要**假设 `~/.claude/qingsheng/` 一定存在——那是某个具体 agent 的实现细节
-- 如果当前 agent 没有 `AskUserQuestion` 工具可用（极少数环境），**才**退化成"列出 3 个选项让用户文字回复 A/B/C"
+- **不要**让用户自己输入路径——默认 `~/.qingsheng/` 就够了
+- **不要**在没建档的情况下先给分析（这是 SKILL.md 「第负一步 Gate A」的硬门）
+- Windows 环境 Bash 用 `$APPDATA/.qingsheng/` 替代 `$HOME/.qingsheng/`（检测 `uname -s` 是 MINGW*/MSYS*/CYGWIN*）
