@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Noto+Serif+SC:wght@300;400;500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 1280px;
+    height: 640px;
+    overflow: hidden;
+  }
+  body {
+    background: radial-gradient(ellipse at center,
+                  hsl(201, 100%, 18%) 0%,
+                  hsl(201, 100%, 13%) 50%,
+                  hsl(201, 100%, 8%) 100%);
+    font-family: 'Inter', 'PingFang SC', sans-serif;
+    color: #fff;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 80px;
+  }
+
+  /* subtle decorative glow */
+  body::before {
+    content: '';
+    position: absolute;
+    top: -200px;
+    left: -200px;
+    width: 800px;
+    height: 800px;
+    background: radial-gradient(circle, rgba(251, 191, 36, 0.05) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  body::after {
+    content: '';
+    position: absolute;
+    bottom: -200px;
+    right: -200px;
+    width: 800px;
+    height: 800px;
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.06) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .logo {
+    font-family: 'Instrument Serif', 'Noto Serif SC', serif;
+    font-size: 100px;
+    font-weight: 400;
+    letter-spacing: -2px;
+    line-height: 1;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 2;
+  }
+  .logo sup {
+    font-size: 22px;
+    vertical-align: super;
+    opacity: 0.5;
+    margin-left: 4px;
+  }
+  .tagline {
+    font-family: 'Instrument Serif', 'Noto Serif SC', serif;
+    font-size: 56px;
+    font-weight: 400;
+    line-height: 1.15;
+    letter-spacing: -1.5px;
+    margin-bottom: 36px;
+    color: rgba(255, 255, 255, 0.92);
+    position: relative;
+    z-index: 2;
+  }
+  .tagline em {
+    font-style: normal;
+    color: rgba(255, 255, 255, 0.45);
+  }
+  .platforms {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    justify-content: center;
+    margin-bottom: 32px;
+    position: relative;
+    z-index: 2;
+  }
+  .chip {
+    padding: 10px 24px;
+    border-radius: 999px;
+    font-size: 22px;
+    font-weight: 500;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(8px);
+  }
+  .subtitle {
+    font-size: 22px;
+    color: rgba(255, 255, 255, 0.55);
+    letter-spacing: 0.02em;
+    position: relative;
+    z-index: 2;
+  }
+  .subtitle strong {
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.75);
+  }
+  .url {
+    position: absolute;
+    bottom: 36px;
+    right: 48px;
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.4);
+    font-family: 'SF Mono', Menlo, monospace;
+    letter-spacing: 0.02em;
+  }
+  .version-tag {
+    position: absolute;
+    top: 36px;
+    left: 48px;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.35);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+</style>
+</head>
+<body>
+  <div class="version-tag">Claude Code Skill · Open Source · MIT</div>
+
+  <div class="logo">情圣<sup>®</sup></div>
+
+  <div class="tagline">爱情，<em>不再遥不可及</em></div>
+
+  <div class="platforms">
+    <span class="chip">💬 微信</span>
+    <span class="chip">🔥 探探</span>
+    <span class="chip">💫 Soul</span>
+    <span class="chip">🐝 Bumble</span>
+    <span class="chip">🌿 青藤之恋</span>
+  </div>
+
+  <div class="subtitle">
+    <strong>中文恋爱教练</strong> · 读懂聊天截图 · 生成高情商回复
+  </div>
+
+  <div class="url">github.com/tomwong001/qingsheng-skill</div>
+</body>
+</html>
