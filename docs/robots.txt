@@ -1,0 +1,21 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://tomwong001.github.io/qingsheng-skill/sitemap.xml
+
+# Baidu Spider
+User-agent: Baiduspider
+Allow: /
+Crawl-delay: 1
+
+# Google
+User-agent: Googlebot
+Allow: /
+
+# Bing
+User-agent: Bingbot
+Allow: /
+
+# Sogou
+User-agent: Sogou web spider
+Allow: /

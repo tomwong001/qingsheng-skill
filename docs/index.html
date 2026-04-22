@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#312E81">
+
+  <title>情圣 · Claude Code 中文恋爱教练技能 | 微信/探探/Soul/Bumble/青藤之恋聊天分析 | qingsheng-skill</title>
+
+  <meta name="description" content="情圣是一个开源免费的 Claude Code 中文恋爱教练 skill。读懂微信、探探、Soul、Bumble、青藤之恋、Tinder 聊天截图，分析女生信号，生成高情商回复，追踪多目标关系阶段。1400+ 真实对话语料训练，本地运行保护隐私，MIT 协议。">
+  <meta name="keywords" content="情圣,qingsheng,Claude Code skill,恋爱AI,情感AI,中文恋爱教练,微信聊天助手,探探开场白,Soul匹配话术,Bumble回复,青藤之恋profile,Tinder中文,恋爱话术,高情商回复,聊天截图分析,朋友圈展示面,约会邀约,冷启动挽回,被已读不回,PUA课程替代,情感咨询替代,7阶段关系模型,多目标档案管理">
+  <meta name="author" content="tomwong001">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <link rel="canonical" href="https://tomwong001.github.io/qingsheng-skill/">
+
+  <!-- Open Graph / Facebook / WeChat -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://tomwong001.github.io/qingsheng-skill/">
+  <meta property="og:title" content="情圣 · Claude Code 中文恋爱教练技能">
+  <meta property="og:description" content="开源免费的中文恋爱 AI 教练。读懂聊天截图，生成高情商回复，追踪多目标关系阶段。覆盖微信/探探/Soul/Bumble/青藤之恋/Tinder 全平台。">
+  <meta property="og:image" content="https://tomwong001.github.io/qingsheng-skill/og-image.png">
+  <meta property="og:image:width" content="1280">
+  <meta property="og:image:height" content="640">
+  <meta property="og:site_name" content="情圣.skill">
+  <meta property="og:locale" content="zh_CN">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="情圣 · Claude Code 中文恋爱教练技能">
+  <meta name="twitter:description" content="开源免费的中文恋爱 AI 教练。读懂聊天截图，生成高情商回复，追踪多目标关系阶段。">
+  <meta name="twitter:image" content="https://tomwong001.github.io/qingsheng-skill/og-image.png">
+
+  <!-- 百度站长验证（之后填）-->
+  <!-- <meta name="baidu-site-verification" content="XXXXXXXXXX"> -->
+
+  <!-- JSON-LD SoftwareApplication Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "情圣 (Qingsheng)",
+    "alternateName": "qingsheng-skill",
+    "description": "开源免费的 Claude Code 中文恋爱教练 skill，读懂聊天截图、分析女生信号、生成高情商回复。",
+    "url": "https://github.com/tomwong001/qingsheng-skill",
+    "sameAs": [
+      "https://github.com/tomwong001/qingsheng-skill"
+    ],
+    "applicationCategory": "Productivity",
+    "operatingSystem": "macOS, Linux, Windows",
+    "inLanguage": "zh-CN",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "author": {
+      "@type": "Person",
+      "name": "tomwong001",
+      "url": "https://github.com/tomwong001"
+    },
+    "license": "https://opensource.org/licenses/MIT",
+    "softwareVersion": "latest",
+    "downloadUrl": "https://github.com/tomwong001/qingsheng-skill",
+    "keywords": "情圣,恋爱AI,中文情感教练,Claude Code skill,微信聊天助手,恋爱话术,约会邀约"
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "微信聊天截图怎么用情圣分析？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "直接在 Claude Code 里把截图粘贴进去，加一句「帮我看看这段」。情圣会 OCR 读出来、标注谁说的、判断关系阶段、给回复建议。聊天记录越长判断越准。"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "女生已读不回怎么办？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "别再发「在吗」「你在忙吗」这类追问。给情圣看聊天记录，它会判断是真的在忙还是被动态度转变。对后者有专门的冷激活流程（/挽回 子命令）。"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "情圣 skill 跟 ChatGPT 裸用有什么区别？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "三件事：1. 中文语感，不是翻译腔；2. 本地档案记忆，每个妹子的进度都存着；3. 策略层，告诉你该不该回、什么时候回、回完节奏怎么走。"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "付费 PUA 课程 vs 情圣 skill？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "付费课程教你装高价值，短期有效长期崩盘。情圣死守真实性原则：档案里没有的故事不会编。而且免费，课程动辄 3000-30000 元。"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "情圣支持哪些平台？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "微信、探探、Soul、Bumble、青藤之恋、陌陌、Tinder。每个平台有独立的 playbook，语气和策略不同。"
+        }
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    :root {
+      --primary: #312E81;
+      --primary-dark: #1E1B4B;
+      --accent: #FBBF24;
+      --text: #1F2937;
+      --text-muted: #6B7280;
+      --bg: #FAFAFA;
+      --bg-card: #FFFFFF;
+      --border: #E5E7EB;
+      --success: #10B981;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei",
+                   "Source Han Sans CN", "Helvetica Neue", sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.7;
+      font-size: 16px;
+    }
+    a { color: var(--primary); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 24px;
+    }
+    nav .wrap {
+      max-width: 1100px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 20px;
+    }
+    nav .logo { font-weight: 700; font-size: 18px; color: var(--primary); }
+    nav .links a { margin-left: 24px; color: var(--text-muted); font-size: 14px; }
+    nav .links a:hover { color: var(--primary); }
+    nav .github {
+      background: var(--primary); color: #fff; padding: 6px 14px;
+      border-radius: 6px; font-size: 14px; font-weight: 500;
+    }
+    nav .github:hover { background: var(--primary-dark); text-decoration: none; }
+
+    .hero {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: #fff;
+      padding: 80px 24px 100px;
+      text-align: center;
+    }
+    .hero h1 {
+      font-size: clamp(32px, 5vw, 56px);
+      font-weight: 800;
+      margin-bottom: 16px;
+      letter-spacing: -0.02em;
+    }
+    .hero .tagline {
+      font-size: clamp(18px, 2.5vw, 24px);
+      opacity: 0.92;
+      margin-bottom: 32px;
+      font-weight: 300;
+    }
+    .hero .subtitle {
+      font-size: 15px;
+      opacity: 0.75;
+      max-width: 720px;
+      margin: 0 auto 40px;
+      line-height: 1.8;
+    }
+    .platform-row {
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 12px;
+      margin: 32px auto;
+      max-width: 720px;
+    }
+    .platform-chip {
+      background: rgba(255,255,255,0.12);
+      padding: 8px 18px; border-radius: 999px;
+      font-size: 14px; font-weight: 500;
+      border: 1px solid rgba(255,255,255,0.25);
+    }
+    .cta-row {
+      display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
+      margin-top: 32px;
+    }
+    .btn {
+      display: inline-block; padding: 14px 28px; border-radius: 8px;
+      font-weight: 600; font-size: 16px; transition: all 0.2s;
+    }
+    .btn-primary {
+      background: var(--accent); color: var(--primary-dark);
+    }
+    .btn-primary:hover {
+      background: #FCD34D; text-decoration: none;
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      background: rgba(255,255,255,0.1); color: #fff;
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.2); text-decoration: none;
+    }
+
+    section {
+      padding: 72px 24px;
+    }
+    section .wrap {
+      max-width: 1100px; margin: 0 auto;
+    }
+    section h2 {
+      font-size: clamp(26px, 3.5vw, 36px);
+      font-weight: 700;
+      margin-bottom: 16px;
+      letter-spacing: -0.01em;
+    }
+    section h2 + p.section-intro {
+      font-size: 17px;
+      color: var(--text-muted);
+      max-width: 720px;
+      margin-bottom: 40px;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .feat {
+      background: var(--bg-card);
+      padding: 28px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+    .feat .icon { font-size: 28px; margin-bottom: 12px; }
+    .feat h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+    .feat p { color: var(--text-muted); font-size: 15px; line-height: 1.65; }
+
+    .bg-alt { background: #F3F4F6; }
+
+    .install-box {
+      background: #0F172A;
+      color: #E2E8F0;
+      padding: 20px 24px;
+      border-radius: 10px;
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+      font-size: 14px;
+      overflow-x: auto;
+      margin: 20px 0;
+      line-height: 1.6;
+    }
+    .install-box .prompt { color: var(--accent); user-select: none; }
+
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--bg-card);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      margin-top: 20px;
+    }
+    .compare-table th, .compare-table td {
+      padding: 14px 16px; text-align: center;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+    .compare-table thead th {
+      background: var(--primary); color: #fff; font-weight: 600;
+    }
+    .compare-table td:first-child,
+    .compare-table th:first-child {
+      text-align: left; font-weight: 500;
+    }
+    .compare-table .us { background: #FEF3C7; font-weight: 600; }
+    .compare-table tr:last-child td { border-bottom: none; }
+    .compare-table .check { color: var(--success); font-weight: 700; }
+    .compare-table .x { color: #DC2626; }
+
+    .faq-item {
+      background: var(--bg-card);
+      padding: 24px 28px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+      border: 1px solid var(--border);
+    }
+    .faq-item h3 {
+      font-size: 17px; font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--primary);
+    }
+    .faq-item p {
+      color: #374151; font-size: 15px; line-height: 1.75;
+    }
+
+    footer {
+      background: var(--primary-dark); color: #fff;
+      padding: 48px 24px 24px;
+      text-align: center;
+    }
+    footer .wrap { max-width: 1100px; margin: 0 auto; }
+    footer .links { margin-bottom: 16px; }
+    footer .links a {
+      color: #A5B4FC; margin: 0 14px; font-size: 14px;
+    }
+    footer .copyright {
+      color: rgba(255,255,255,0.55);
+      font-size: 13px;
+    }
+    footer .slogan {
+      font-style: italic;
+      margin-bottom: 24px;
+      opacity: 0.85;
+    }
+
+    @media (max-width: 640px) {
+      nav .links a { margin-left: 12px; font-size: 13px; }
+      section { padding: 48px 18px; }
+      .hero { padding: 56px 18px 72px; }
+      .compare-table th, .compare-table td { padding: 10px 8px; font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="#top" class="logo">情圣.skill</a>
+    <div class="links">
+      <a href="#features">特性</a>
+      <a href="#install">安装</a>
+      <a href="#compare">对比</a>
+      <a href="#faq">常见问题</a>
+      <a href="https://github.com/tomwong001/qingsheng-skill" class="github">GitHub →</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <h1>情圣.skill</h1>
+  <p class="tagline">中文恋爱教练 · Claude Code Skill</p>
+  <p class="subtitle">
+    在 Claude Code / Cursor 里加载的中文恋爱 AI 私教。
+    读懂聊天截图、分析女生信号、生成高情商回复、追踪多目标关系阶段。
+    基于 1400+ 真实对话语料 + 社会心理学实证研究。
+    本地运行保护隐私，MIT 协议完全免费。
+  </p>
+
+  <div class="platform-row">
+    <span class="platform-chip">💬 微信</span>
+    <span class="platform-chip">🔥 探探</span>
+    <span class="platform-chip">💫 Soul</span>
+    <span class="platform-chip">🐝 Bumble</span>
+    <span class="platform-chip">🌿 青藤之恋</span>
+    <span class="platform-chip">🌙 陌陌</span>
+    <span class="platform-chip">🔥 Tinder</span>
+  </div>
+
+  <div class="cta-row">
+    <a href="https://github.com/tomwong001/qingsheng-skill" class="btn btn-primary">⭐ Star on GitHub</a>
+    <a href="#install" class="btn btn-secondary">立即安装</a>
+  </div>
+</header>
+
+<section id="features">
+  <div class="wrap">
+    <h2>它做什么</h2>
+    <p class="section-intro">
+      不是 PUA 教学、不是 ChatGPT 套壳、不教你装高价值。
+      一个站在你这边的军师，帮你在每个关键节点做出更好的选择。
+    </p>
+
+    <div class="features">
+      <div class="feat">
+        <div class="icon">📸</div>
+        <h3>聊天截图 OCR 分析</h3>
+        <p>把微信、探探、Soul 等平台的聊天截图直接贴进来。情圣读懂每一条消息、判断阶段、识别 IOI / IOD 信号，然后告诉你下一步该怎么走。</p>
+      </div>
+      <div class="feat">
+        <div class="icon">💬</div>
+        <h3>高情商回复生成</h3>
+        <p>基于 1400+ 真实对话语料的话术库，给你 2-3 条可直接发的回复，附带"为什么这么回"的策略解释。不是生硬模板，是真的有人情味的中文。</p>
+      </div>
+      <div class="feat">
+        <div class="icon">🪜</div>
+        <h3>7 阶段关系推进模型</h3>
+        <p>从破冰到确立，每个阶段有明确判断标准。避免你在暧昧期（阶段 3）急着表白，或在约会期（阶段 5）还在用破冰话术。</p>
+      </div>
+      <div class="feat">
+        <div class="icon">👥</div>
+        <h3>多目标档案管理</h3>
+        <p>同时和几个人聊？情圣给每个妹子独立建档，记住你们的全部进展。下次说「复盘小雨」就能一键回忆上次聊到哪。</p>
+      </div>
+      <div class="feat">
+        <div class="icon">📱</div>
+        <h3>朋友圈展示面诊断</h3>
+        <p>/展示面 子命令：头像打分、bio 诊断、朋友圈内容分析、照片组合建议。每一项都给分数 + 具体改法。</p>
+      </div>
+      <div class="feat">
+        <div class="icon">❄️</div>
+        <h3>冷启动与挽回</h3>
+        <p>/挽回 子命令：聊天冷了用冷激活流程，分手想复合用关系恢复流程。先诊断再给时间线，不鼓励纠缠。</p>
+      </div>
+      <div class="feat">
+        <div class="icon">🤖</div>
+        <h3>Autopilot 对话规划</h3>
+        <p>/自动 子命令：不知道接下来几天怎么聊？情圣一次性给你 3-5 轮对话树，带分支和节奏控制，你只要照着发就行。</p>
+      </div>
+      <div class="feat">
+        <div class="icon">🔒</div>
+        <h3>本地运行保护隐私</h3>
+        <p>所有聊天数据在你本地处理，不上传任何服务器。档案存在 ~/.qingsheng/ 下，随时可以查看或删除。</p>
+      </div>
+      <div class="feat">
+        <div class="icon">💯</div>
+        <h3>真实性原则</h3>
+        <p>情圣永远不会替你编经历。话术里用到你的兴趣、特长、故事都必须基于你真实填写的档案——档案里没有的，它会先问你。这是它和付费 PUA 课程最本质的区别。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="install" class="bg-alt">
+  <div class="wrap">
+    <h2>安装</h2>
+    <p class="section-intro">5 秒装好，支持 Claude Code 和 Claude Cowork。</p>
+
+    <h3 style="font-size:18px;margin-top:24px;margin-bottom:12px;">方式一：Claude Code（一键）</h3>
+    <p>打开 Claude Code，把下面这句话发给它：</p>
+    <div class="install-box">
+<span class="prompt">&gt;</span> 帮我安装情圣 skill：https://github.com/tomwong001/qingsheng-skill
+    </div>
+    <p style="color: var(--text-muted); font-size: 14px;">
+      Claude 会自动完成所有步骤。之后说 <code>/qingsheng-upgrade</code> 可随时升级。
+    </p>
+
+    <h3 style="font-size:18px;margin-top:32px;margin-bottom:12px;">方式二：命令行手动装</h3>
+    <div class="install-box">
+<span class="prompt">$</span> bash &lt;(curl -fsSL https://raw.githubusercontent.com/tomwong001/qingsheng-skill/main/setup)
+    </div>
+
+    <h3 style="font-size:18px;margin-top:32px;margin-bottom:12px;">方式三：Claude Cowork（零命令行）</h3>
+    <p>
+      <a href="https://github.com/tomwong001/qingsheng-skill/releases/latest/download/qingsheng-skill.skill">下载 .skill 文件</a>
+      → 打开 Cowork → Customize tab → 上传。搞定。
+    </p>
+
+    <h3 style="font-size:18px;margin-top:32px;margin-bottom:12px;">开始使用</h3>
+    <p>装好后，在任何一段对话里直接说：</p>
+    <div class="install-box">
+<span class="prompt">&gt;</span> 帮我看看这段聊天
+<span class="prompt">&gt;</span> 她这话什么意思
+<span class="prompt">&gt;</span> 探探匹配了怎么开场
+    </div>
+  </div>
+</section>
+
+<section id="compare">
+  <div class="wrap">
+    <h2>对比其他方案</h2>
+    <p class="section-intro">为什么不用 ChatGPT 裸聊？为什么不报付费 PUA 课？</p>
+
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th></th>
+          <th class="us">情圣 Skill</th>
+          <th>ChatGPT 裸用</th>
+          <th>付费 PUA 课程</th>
+          <th>其他恋爱 AI App</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>中文语境</td>
+          <td class="us check">✅ 母语级</td>
+          <td class="x">⚠️ 翻译腔</td>
+          <td class="check">✅</td>
+          <td>参差不齐</td>
+        </tr>
+        <tr>
+          <td>聊天截图 OCR</td>
+          <td class="us check">✅ 内置</td>
+          <td class="check">✅</td>
+          <td class="x">❌</td>
+          <td>部分支持</td>
+        </tr>
+        <tr>
+          <td>多目标档案</td>
+          <td class="us check">✅ 同时追多个</td>
+          <td class="x">❌ 上下文丢</td>
+          <td>—</td>
+          <td class="x">❌</td>
+        </tr>
+        <tr>
+          <td>7 阶段关系模型</td>
+          <td class="us check">✅ 实时判断</td>
+          <td class="x">❌</td>
+          <td class="check">✅</td>
+          <td class="x">❌</td>
+        </tr>
+        <tr>
+          <td>真实性原则</td>
+          <td class="us check">✅ 不编故事</td>
+          <td>⚠️ 会编</td>
+          <td class="x">❌ 教你装</td>
+          <td class="x">❌ 模板化</td>
+        </tr>
+        <tr>
+          <td>本地运行 / 隐私</td>
+          <td class="us check">✅ 不上传</td>
+          <td class="x">❌</td>
+          <td>—</td>
+          <td class="x">❌</td>
+        </tr>
+        <tr>
+          <td>价格</td>
+          <td class="us check">免费 · MIT</td>
+          <td>¥150+/月</td>
+          <td>¥3000–30000</td>
+          <td>¥30+/月</td>
+        </tr>
+        <tr>
+          <td>开源可审计</td>
+          <td class="us check">✅ GitHub</td>
+          <td class="x">❌</td>
+          <td class="x">❌</td>
+          <td class="x">❌</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p style="margin-top: 24px; color: var(--text-muted); font-size: 15px;">
+      简单说：<strong>付费课程教你"装"，ChatGPT 裸用没"中文恋爱语感"，情圣 skill 把真实性 + 中文语境 + 长期档案管理三件事做到一起，而且免费。</strong>
+    </p>
+  </div>
+</section>
+
+<section id="faq" class="bg-alt">
+  <div class="wrap">
+    <h2>常见问题</h2>
+    <p class="section-intro">10 个用户最常问的问题。</p>
+
+    <div class="faq-item">
+      <h3>Q: 微信聊天截图怎么用情圣分析？</h3>
+      <p>直接在 Claude Code 里把截图粘贴进去，加一句"帮我看看这段"。情圣会 OCR 读出来、标注谁说的、判断关系阶段、给回复建议。聊天记录长度越长判断越准。</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>Q: 探探 / Soul / Bumble 匹配后不知道怎么开场？</h3>
+      <p>把对方的 profile 截图发进来（照片 + bio + 兴趣标签都要），说"帮我想开场白"。情圣会根据她 profile 里的具体信息给 2-3 条开场，不发"在吗"这种低价值开场。每个平台有专门的 playbook。</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>Q: 女生已读不回怎么办？</h3>
+      <p>别再发"在吗""你在忙吗"——这种追问会让局势更坏。给情圣看聊天记录，它会判断是<strong>真的在忙</strong>（正常，等两天）还是<strong>被动态度转变</strong>（要调整策略）。对第二种有专门的冷激活流程（/挽回 子命令）。</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>Q: 青藤之恋 profile 怎么写更吸引人？</h3>
+      <p>用 /展示面 子命令。情圣会逐项诊断你的头像、bio、兴趣标签、照片组合，给每一项打分 + 具体改法。青藤之恋有专门的严肃交友语气规则，不会让你写成探探风格。</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>Q: 被女生冷处理后还能挽回吗？</h3>
+      <p>分场景。聊天冷了（&lt; 2 周没回）用 /挽回 的冷激活路径；分手想复合用关系恢复路径。两种都会先做诊断（问题在哪），再给 3-5 步时间线 + 第一条消息。情圣不会鼓励你做纠缠性行为——对方明确拒绝时会直接告诉你"到此为止"。</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>Q: 聊天冷场了怎么重启？</h3>
+      <p><strong>最差的选择就是发"在吗"或者"在干嘛"</strong>。情圣会根据你们上次聊到哪给出有记忆点的重启话术（比如：之前她提过喜欢一个乐队 → "那天说到 XX，今天看到他们要开演唱会了"）。有记忆点的重启才不显得功利。</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>Q: 什么时候该邀约见面？</h3>
+      <p>看阶段。阶段 3（暧昧期）末段 + 聊天里出现<strong>地点信号</strong>（她提到去过某地 / 想去某地）就是自然的邀约窗口。情圣会在合适的窗口主动提醒你"可以邀约了"，并给你具体的邀约话术（三步法：锚定场景 → 给时间选项 → 具体细节钉死）。</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>Q: 朋友圈发什么能吸引异性？</h3>
+      <p><strong>不是发豪车豪宅</strong>——那是低智商展示。/展示面 会告诉你发什么：真实的生活片段（带情绪 / 带观察角度）、有"勾子"的图文（让人想评论）、节奏（频率不能太高也不能太低）。情圣有一个朋友圈素材库思路，教你怎么用真实生活当素材。</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>Q: 跟 ChatGPT 裸用有啥区别？</h3>
+      <p>三件事：<br>
+        <strong>① 中文语感</strong> —— ChatGPT 会给"你好，很高兴认识你"这种翻译腔。情圣只给真正有人情味的中文<br>
+        <strong>② 关系记忆</strong> —— ChatGPT 每次对话独立，情圣会把每个妹子的档案存到本地，下次接着上次的进度<br>
+        <strong>③ 策略层</strong> —— ChatGPT 只做"这句怎么回"，情圣告诉你<strong>这阶段该不该回、什么时候回、回了之后节奏怎么走</strong>
+      </p>
+    </div>
+
+    <div class="faq-item">
+      <h3>Q: 付费 PUA 课程 vs 情圣 skill？</h3>
+      <p>付费课程核心思路是"装高价值"（假名车、假人设、假炫富）—— 短期有效，长期崩盘（对方发现你是装的，走人）。情圣<strong>死守真实性原则</strong>：档案里没有的故事不会编，真正靠你自己的特长 + 节奏感 + 对信号的准确判断来吸引人。而且情圣免费，课程动辄 ¥3000-30000。</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p class="slogan">"我会陪在你身边，帮你把到你最心仪的妹子。"</p>
+
+    <div class="links">
+      <a href="https://github.com/tomwong001/qingsheng-skill">GitHub 仓库</a>
+      <a href="https://github.com/tomwong001/qingsheng-skill/blob/main/CHANGELOG.md">更新日志</a>
+      <a href="https://github.com/tomwong001/qingsheng-skill/issues">提 Issue</a>
+      <a href="https://github.com/tomwong001/qingsheng-skill/discussions">Discussions</a>
+      <a href="https://github.com/tomwong001/qingsheng-skill/blob/main/LICENSE">MIT License</a>
+    </div>
+
+    <p class="copyright">
+      © 2026 情圣.skill · MIT License · Built by <a href="https://github.com/tomwong001" style="color:inherit;">@tomwong001</a> with ❤️ and a lot of 兄弟聊天
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>
