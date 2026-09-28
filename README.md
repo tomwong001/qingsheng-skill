@@ -365,3 +365,7 @@ qingsheng-skill/
 <sub>Built with ❤️ and a lot of 兄弟聊天.</sub>
 
 </div>
+
+## ⭐ Star History
+
+[![Star History Chart](https://api.star-history.com/chart?repos=tomwong001/qingsheng-skill&type=date&legend=top-left)](https://www.star-history.com/#tomwong001/qingsheng-skill&Date)
